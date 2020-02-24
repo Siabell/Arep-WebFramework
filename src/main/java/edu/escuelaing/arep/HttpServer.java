@@ -17,84 +17,13 @@ public class HttpServer {
 	static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "notSupported.html";
 
-	/*
-	public static void main(String[] args) throws IOException {
-		int port = getPort();
-		ServerSocket serverSocket = null;
-		try { 
-		      serverSocket = new ServerSocket(port);
-		   } catch (IOException e) {
-		      System.err.println("Could not listen on port: " + port);
-		      System.exit(1);
-		   }
-		
-		PrintWriter out =null;
-    	BufferedReader in =null;
-    	String inputLine;
-    	String fileReq = null;
-    	BufferedOutputStream outputLine = null;
-		Socket clientSocket = null;
-		
-		while (true) {
-			try {
-			       System.out.println("Listo para recibir ...");
-			       clientSocket = serverSocket.accept();
-			   } catch (IOException e) {
-			       System.err.println("Accept failed.");
-			       System.exit(1);
-			   }
-			
-
-	    	out = new PrintWriter(clientSocket.getOutputStream(), true);
-	    	in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			int first = 0;
-			String[] header = null;
-	    	while ((inputLine = in.readLine()) != null) {
-	    		if (first == 0) {
-	    			header = inputLine.split(" ");
-	    			outputLine = new BufferedOutputStream(clientSocket.getOutputStream());
-	    	    	if (header[0].equals("GET")) {
-	    				 System.out.println("es un get");
-	    				 fileReq = header[1];
-	    				 if (header[1].equals("/")) {
-	    					 System.out.println("por defecto");
-	    					 File file = new File(WEB_ROOT,DEFAULT_FILE);
-	    	 				 sendResponse(out,file,"text/html",outputLine,"200 ok");
-	    				 }else {
-				 				File file = new File(WEB_ROOT,fileReq);
-				 				if (!file.exists()) {
-				 					System.out.println("no existe el archivo "+fileReq);
-				 					File fileNotFound = new File(WEB_ROOT,FILE_NOT_FOUND);
-					 				sendResponse(out,fileNotFound,"text/html",outputLine,"404 NOT_FOUND");
-				 				} else {
-				 					System.out.println("si existe el archuivo "+fileReq);
-				 					String contentMimeType = defineContentType(fileReq);
-				 					sendResponse(out,file,contentMimeType,outputLine,"200 ok");
-				 				}
-				 			}
-	    	    	} else {
-	    				 //metodo no permitido
-	    				 File file = new File(WEB_ROOT,METHOD_NOT_SUPPORTED);
-	    				 sendResponse(out,file,"text/html",outputLine,"405 METHOD_NOT_ALLOWED");
-	    			 }	       			
-	    	    	
-	    			first++;
-	    		  }
-			      System.out.println("Recibí: " + inputLine);
-			      header = inputLine.split(" ");
-			      if (!in.ready()) {
-			    	  break;
-			      } 
-			}
-	    	
-			out.close();
-			in.close(); 
-			clientSocket.close(); 
-		}
 	
-	}
-	*/
-	
+	/**
+	 * Maneja cual es el recurso que quiero obtener el cliente y da una respuesta
+	 * @param header
+	 * @param out
+	 * @param outputLine
+	 */
 	public static void requestOption (String[] header, PrintWriter out, BufferedOutputStream outputLine) {
 		if (header[0].equals("GET")) {
 			 System.out.println("es un get");
@@ -169,16 +98,6 @@ public class HttpServer {
     }
  
 	
-	/**
-     * Retorna el puerto por el que va a escuchar el servidor
-     * @return puerto por el que va a escuchar el servidor
-     */
-    private static int getPort() {
-        if (System.getenv("PORT") != null) {
-            return Integer.parseInt(System.getenv("PORT"));
-        }
-        return 4567; //returns default port if heroku-port isn't set (i.e. on localhost)
-    }
     
     /**
      * Convierte un archivo a bytes

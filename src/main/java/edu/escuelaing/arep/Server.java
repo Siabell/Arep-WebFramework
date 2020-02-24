@@ -24,7 +24,11 @@ public class Server {
 	private static BufferedOutputStream outputLine;
 	private static Socket clientSocket;
 	
-	
+	/**
+	 * Inicia el servicio del server, cargando todas las clases que posean
+	 * la annotacion web y las agrega a un hashmap donde estan los metodos con
+	 * esta anotacion
+	 */
 	public static void iniciar() {
 		String pathP = "edu.escuelaing.arep.webservice";
 		String path = "edu/escuelaing/arep/webservice";
@@ -63,6 +67,11 @@ public class Server {
 		}
 	}
 	
+	
+	/**
+	 * Escucha el puerto y atiende los request de los clientes diferenciendo entre peticiones
+	 * estaticas(serverhttp) y dinamicas(annotacion web)
+	 */
 	public static void listen()  {
 		
 		
@@ -128,6 +137,10 @@ public class Server {
 		
 	}
 	
+	/**
+	 * Agrega a el hashmap de metodos con la annotacion web un nuevo metodo que tenga esta anotacion
+	 * @param className nombre de la clase a probar si tiene la anotacion
+	 */
 	private static void addMethodswithWeb(String className) {
 		try {
 			Class c = Class.forName(className);
@@ -145,6 +158,11 @@ public class Server {
 		}
 	}
 	
+	/**
+	 * Retorna un string con la invocacion de un metodo
+	 * @param m metodo a invocar
+	 * @return Strinf de la invocacion del metodo
+	 */
 	private static String invokeMethods(Method m) {
 		String answer = null;
 		try {
