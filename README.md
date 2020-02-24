@@ -3,6 +3,7 @@
 
 This application implements a framework created with java that contains a web server that supports multiple consecutive requests and returns the requested files including html pages and images.The framework that allows a developer to create responds to requests through annotations about the methods created by the developer.
 
+[![CircleCI](https://circleci.com/gh/Siabell/Arep-WebFramework/tree/circleci-project-setup.svg?style=svg)](https://circleci.com/gh/Siabell/Arep-WebFramework/tree/circleci-project-setup)
 ## Getting Started
 
  In order to use this project, first clone this repository or download the project.
