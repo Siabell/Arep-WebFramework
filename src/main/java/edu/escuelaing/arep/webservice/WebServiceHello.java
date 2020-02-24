@@ -3,7 +3,8 @@ package edu.escuelaing.arep.webservice;
 import edu.escuelaing.arep.annotations.Web;
 
 public class WebServiceHello {
-	@Web
+	
+	@Web("hello")
 	public static String Hello() {
 		return (" <html lang=\"en\">\r\n" + 
 				"\r\n" + 
