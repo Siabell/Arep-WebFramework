@@ -57,8 +57,20 @@ You will need maven java installed on your machine to employ this program
 
 ## Deployment
 
-[webServer](http://cliente-servidor2.herokuapp.com/) - heroku deploy
+[Web server App heroku](https://webframeworkarep.herokuapp.com/) - heroku deploy
 
+* main page
+![jpg](src/main/resources/images/index.PNG)
+
+* static resources
+![image.png](src/main/resources/images/png.PNG)
+![image.jpg](src/main/resources/images/jpg.PNG)
+
+* file not found
+![NotFound](src/main/resources/images/notFound.PNG)
+
+* dinamic result
+![hello](src/main/resources/images/hello.PNG)
 
 ## Built With
 
