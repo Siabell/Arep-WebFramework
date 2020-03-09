@@ -6,6 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import edu.escuelaing.arep.annotations.Web;
 
@@ -23,6 +25,7 @@ public class Server {
 	private static BufferedReader in;
 	private static BufferedOutputStream outputLine;
 	private static Socket clientSocket;
+	private static ExecutorService executor;
 	
 	/**
 	 * Inicia el servicio del server, cargando todas las clases que posean
@@ -73,7 +76,7 @@ public class Server {
 	 * estaticas(serverhttp) y dinamicas(annotacion web)
 	 */
 	public static void listen()  {
-		
+		executor = Executors.newFixedThreadPool(10);
 		
 			int port = getPort();
 			try { 
@@ -86,51 +89,14 @@ public class Server {
 			try {
 			       System.out.println("Listo para recibir ...");
 			       clientSocket = serverSocket.accept();
+			       Thread thread = new Thread(new HttpServer(clientSocket,webMethods));
+	                executor.execute(thread);
+	                
 			   } catch (IOException e) {
 			       System.err.println("Accept failed.");
+			       executor.shutdown();
 			       System.exit(1);
 			   }
-			
-			try {
-				out = new PrintWriter(clientSocket.getOutputStream(), true);
-				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-				outputLine = new BufferedOutputStream(clientSocket.getOutputStream());
-				String inputLine;
-				int first = 0;
-				String[] header = null;
-				while ((inputLine = in.readLine()) != null) {
-		    		if (first == 0) {
-		    			header = inputLine.split(" ");
-		    			String fileReq = header[1];
-		    			System.out.println("el archivo es "+fileReq);
-		    			if (webMethods.containsKey(fileReq)) {
-		    				HttpServer.sendResponse(out,null,"text/html",outputLine,"200 ok");
-		    				String answer = invokeMethods(webMethods.get(fileReq));
-		    				out.write(answer + "\r\n");
-                            out.flush();
-		    			}else {
-		    				HttpServer.requestOption(header,out,outputLine);
-		    			}
-		    			
-		    			first ++;
-		    		}
-		    		if (!in.ready()) {
-                        break;
-                    }
-				}
-				
-				
-				out.close();
-				in.close(); 
-				clientSocket.close(); 
-				
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	    	
-			
 			
 			
 		}

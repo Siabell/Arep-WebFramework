@@ -2,21 +2,92 @@ package edu.escuelaing.arep;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.ServerSocket;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
 
 import java.net.*;
 
-public class HttpServer {
+public class HttpServer implements Runnable{
 	
 	static final String DEFAULT_FILE = "index.html";
 	static final File WEB_ROOT = new File(System.getProperty("user.dir") + "/src/main/resources");
 	static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "notSupported.html";
+    private static Map<String,Method> webMethods = new HashMap();
+	private static int port;
+	private static ServerSocket serverSocket;
+	private static PrintWriter out;
+	private static BufferedReader in;
+	private static BufferedOutputStream outputLine;
+	private static Socket clientSocket;
 
+	public HttpServer(Socket clientSocket, Map<String, Method> webMethods) {
+        this.clientSocket = clientSocket;
+        System.out.println("Connection accepted.");
+        this.webMethods = webMethods;
+    }
+	
+	public void run() {
+		
+		try {
+			out = new PrintWriter(clientSocket.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			outputLine = new BufferedOutputStream(clientSocket.getOutputStream());
+			String inputLine;
+			int first = 0;
+			String[] header = null;
+			System.out.println();
+			inputLine = in.readLine();
+			while ((inputLine) != null) {
+				
+	    		if (first == 0) {
+	    			header = inputLine.split(" ");
+	    			String fileReq = header[1];
+	    			System.out.println("el archivo es "+fileReq);
+	    			if (webMethods.containsKey(fileReq)) {
+	    				sendResponse(out,null,"text/html",outputLine,"200 ok");
+	    				String answer = invokeMethods(webMethods.get(fileReq));
+	    				out.write(answer + "\r\n");
+                        out.flush();
+	    			}else {
+	    				requestOption(header);
+	    			}
+	    			
+	    		}
+	    		if (!in.ready()) {
+                    break;
+                }
+    			inputLine = in.readLine();
+    			first ++;
+	    		
+			}
+			
+			Thread.sleep(100);
+			this.finalize();
+			out.close();
+			in.close(); 
+			outputLine.close();
+			//clientSocket.close(); 
+			
+			
+			System.out.println("finalizo ------------------");
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	
 	/**
 	 * Maneja cual es el recurso que quiero obtener el cliente y da una respuesta
@@ -24,7 +95,7 @@ public class HttpServer {
 	 * @param out
 	 * @param outputLine
 	 */
-	public static void requestOption (String[] header, PrintWriter out, BufferedOutputStream outputLine) {
+	public static void requestOption (String[] header) {
 		if (header[0].equals("GET")) {
 			 System.out.println("es un get");
 			 String fileReq = header[1];
@@ -141,6 +212,28 @@ public class HttpServer {
     	}
     	return answer;
     }
+    
+    /**
+	 * Retorna un string con la invocacion de un metodo
+	 * @param m metodo a invocar
+	 * @return Strinf de la invocacion del metodo
+	 */
+	private static String invokeMethods(Method m) {
+		String answer = null;
+		try {
+			answer = (String) m.invoke(null, null);
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return answer;
+	}
     
     
 }
